@@ -1,0 +1,98 @@
+"modality": "rna+fish"
+"spl_pct": .1
+"train": {"n_seeds": 1, "test_mode": True}
+"eval": {"remove_data": True, "k_neighbors": 10}
+"scenarios": [
+  ['Syt6', 'Bmp4', 'Anln'],
+  ['Sox10', 'Crhbp', 'Mrc1'],
+#  ['Hexb', 'Mfge8', 'Rorb'],
+#  ['Acta2', 'Vtn', 'Ctps'],
+#  ['Serpinf1', 'Tbr1', 'Aldoc'],
+#  ['Flt1', 'Cpne5', 'Gfap'],
+#  ['Foxj1', 'Tmem2', 'Slc32a1'],
+#  ['Kcnip2', 'Pthlh', 'Vip'],
+#  ['Plp1', 'Itpr2', 'Pdgfra'],
+#  ['Lamp5', 'Crh', 'Apln'],
+#  ['Ttr', 'Cnr1', 'Gad2']
+]
+"remove_data": False
+
+"baseline_cfgs": {#"Uniport": {"seeds": [37, 24, 369, 713, 48], "rm_data": True, "no_mix": False, "tr_length": 30000},
+                  "MultiMAP": {"seeds": [37, 24, 369, 713, 48], "rm_data": True},
+                  #"scGLUE": {"seeds": [37, 24, 369, 713, 48], "rm_data": True, "cpu_only": False, "tr_length": "AUTO", "latent_dim": 15},
+                  #"GIMVI": {"seeds": [37, 24, 369, 713, 48], "rm_data": True, "no_mix": False, "tr_length": 200, "normalized": True, "only_cm": True}
+                  "Seurat": {"seeds": [37], "rm_data": True, "n_latent": null},
+                  #"Liger": {"seeds": [37, 24, 369, 713, 48], "rm_data": True, "n_latent": null}
+}
+
+
+"data": {"subsample_seed": 42,
+         "paired": False,
+         "rna": {
+           "QC": { "min_cells_ratio": 0., "max_cells_ratio": 1., "min_features": 100, "max_features": 20000 },
+           "normalization": { "target_sum": 10000. },
+           "feature_selection": { "raw": { "n_top_features": 3000 },
+                                  "normalized": { "n_top_features": 3000 } },
+           "n_pca": 100},
+           "fish": {
+             "QC": { "min_cells_ratio": 0., "max_cells_ratio": 1., "min_features": 5, "max_features": 100000 },
+             "normalization": { "target_sum": null },
+             "feature_selection": { "raw": { "n_top_features": 3000 },
+                                    "normalized": { "n_top_features": 3000 } },
+             "n_pca": null },
+
+           "cross_rel": { "rna+fish": { "common_features": { },
+                                        "prepro": { "rna": { "norm_method": "log_norm", "norm_params": { "target_sum": 1000. },
+                                                             "hvg": { }, "scale": False, "scale_params": { } },
+                                                    "fish": { "norm_method": "fish_norm", "norm_params": { },
+                                                              "hvg": { }, "scale": False, "scale_params": { } } } } }}
+
+"model":  { # null means using data.X so normalized data
+    "input_choice": { "rna": { "hvg_only": True,
+                               "rep_in": "X_pca", "rep_out": "counts" },
+                      "fish": { "hvg_only": False,
+                                "rep_in": null, "rep_out": null } },
+    "model": { "mmae_args": { "mass": 0.5,
+                              "reach": 1.,
+                              "blur": 0.01,
+                              "iot_loss_weight": 0.05,
+                              "sinkhorn_loss_weight": 0.1 },
+               "n_hidden": null,
+               "n_latent": 16,
+               "impute": False,
+               "monitor_mix_entr": False,
+               "rna": { "n_hidden": 64,
+                        "avg_feat": True,
+                        "var_eps": 0.0001,
+                        "n_layers_enc": 3,
+                        "type_loss": "zinb",
+                        "dropout_rate": 0.,
+                        "use_batch_norm_enc": null,
+                        "use_batch_norm_dec": null,
+                        "deeply_inject_covariates_dec": True,
+               },
+               "fish": { "n_hidden": 25,
+                         "avg_feat": True,
+                         "var_eps": 0.0001,
+                         "n_layers_enc": 2,
+                         "type_loss": "l2",
+                         "dropout_rate": 0.,
+                         "use_batch_norm_enc": null,
+                         "use_batch_norm_dec": null,
+                         "deeply_inject_covariates_dec": True,
+               } },
+    "train": { "max_epochs": 10000,
+               "batch_size": 512,
+               "ratio_val": 0.2,
+               "pin_memory": True,
+               "num_workers": 0,
+               "use_cuda": True,
+               "lr": 0.003,
+               "early_stopping": True,
+               "patience": 40,
+               "es_metric": "val_full_loss",
+               "log_every_n_steps": 40,
+               "detect_anomaly": False,
+               "track_grad_norm": -1, },
+    "second": null
+}

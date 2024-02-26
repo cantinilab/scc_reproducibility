@@ -1,0 +1,76 @@
+"modality": "rna+morph"
+"spl_pct": 1.
+"train": {"n_seeds": 1, "test_mode": True}
+"remove_data": False
+
+
+"data": {"subsample_seed": 42,
+         "paired": False,
+         "rna": {
+           "QC": { "min_cells_ratio": 0.05, "max_cells_ratio": 1., "min_features": 100, "max_features": 20000 },
+           "normalization": { "target_sum": 10000. },
+           "feature_selection": { "raw": { "n_top_features": null },
+                                  "normalized": { "n_top_features": 2000 } },
+           "n_pca": 100 },
+           "morph": {
+             "QC": { "min_cells_ratio": 0.05, "max_cells_ratio": 1., "min_features": 1, "max_features": 100000 },
+             "normalization": { "target_sum": null },
+             "feature_selection": { "raw": { "n_top_features": 3000 },
+                                    "normalized": { "n_top_features": 3000 } },
+             "n_pca": null },
+
+           "cross_rel": { "rna+morph": { "common_features": { },
+                                         "prepro": { "rna": { "norm_method": "log_norm", "norm_params": { "target_sum": 10000. },
+                                                              "hvg": { "n_top_genes": 2000 }, "scale": False, "scale_params": { } },
+                                                     "morph": { "norm_method": "log_norm", "norm_params": { "target_sum": 10000. },
+                                                                "hvg": { }, "scale": False, "scale_params": { } } } } }}
+
+"model":  { # null means using data.X so normalized data
+    "input_choice": { "rna": { "hvg_only": True,
+                               "rep_in": "X_pca", "rep_out": "counts" },
+                      "morph": { "hvg_only": False,
+                                 "rep_in": null, "rep_out": null } },
+    "model": { "mmae_args": { "mass": 0.75,
+                              "reach": null,
+                              "blur": 0.01,
+                              "iot_loss_weight": 0.05,
+                              "sinkhorn_loss_weight": 0. },
+               "n_hidden": null,
+               "n_latent": 16,
+               "impute": False,
+               "monitor_mix_entr": False,
+               "rna": { "n_hidden": 64,
+                        "avg_feat": True,
+                        "var_eps": 0.0001,
+                        "n_layers_enc": 3,
+                        "type_loss": "zinb",
+                        "dropout_rate": 0.,
+                        "use_batch_norm_enc": null,
+                        "use_batch_norm_dec": null,
+                        "deeply_inject_covariates_dec": True,
+               },
+               "morph": { "n_hidden": 128,
+                        "type_loss": "l2",
+                        "avg_feat": True,
+                        "n_layers_enc": 2,
+                        "var_eps": 0.0001,
+                        "dropout_rate": 0.,
+                        "use_batch_norm_enc": null,
+                        "use_batch_norm_dec": null,
+                        "deeply_inject_covariates_dec": True,
+               } },
+    "train": { "max_epochs": 10000,
+               "batch_size": 512,
+               "ratio_val": 0.2,
+               "pin_memory": True,
+               "num_workers": 0,
+               "use_cuda": True,
+               "lr": 0.003,
+               "early_stopping": True,
+               "patience": 40,
+               "es_metric": "val_full_loss",
+               "log_every_n_steps": 40,
+               "detect_anomaly": False,
+               "track_grad_norm": -1, },
+    "second": null
+}
