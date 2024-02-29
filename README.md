@@ -50,4 +50,24 @@ python run_imputation.py --dataname <dataname> (--baseline)
 ```
 
 ### Generating the figures
-To be completed (soon)
+Before running any notebook, download the pickles from [there](https://figshare.com/s/10860420658b68bb1eb5)
+ and place them inside a folder entitled 
+`exp_results` in the root of this directory. These files contain saved results (latent 
+embeddings and their evaluations) of each method run with the provided configurations as 
+the training of all methods is very long. Then run the notebooks to obtain the plots 
+from the paper.
+As of now, only cell lines and benchmark plots are available. The rest will be added 
+shortly.
+
+## Our preprint
+https://www.biorxiv.org/content/10.1101/2024.02.26.582051v1
+```bibtex
+@article {Samaran2024unpaired,
+  author = {Jules Samaran and Gabriel Peyre and Laura Cantini},
+  title = {scConfluence : single-cell diagonal integration with regularized Inverse Optimal Transport on weakly connected features},
+  year = {2024},
+  doi = {10.1101/2024.02.26.582051},
+  publisher = {Cold Spring Harbor Laboratory},
+  journal = {bioRxiv}
+}
+```
